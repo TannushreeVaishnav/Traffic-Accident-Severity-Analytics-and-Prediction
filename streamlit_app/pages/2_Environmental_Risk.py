@@ -21,26 +21,33 @@ st.markdown("Examine how adverse weather conditions, lighting, and road surfaces
 
 @st.cache_data(ttl=60)
 def load_environmental_data():
-    engine = get_engine()
-    query = """
-        SELECT 
-            w.weather_condition,
-            w.weather_risk_level,
-            w.temperature_c,
-            w.precipitation_mm,
-            w.visibility_m,
-            r.road_type,
-            r.speed_limit,
-            r.light_conditions,
-            r.road_surface_conditions,
-            s.severity_name,
-            f.number_of_casualties
-        FROM fact_accidents f
-        JOIN dim_road r ON f.road_key = r.road_key
-        JOIN dim_weather w ON f.weather_key = w.weather_key
-        JOIN dim_severity s ON f.severity_key = s.severity_key
-    """
-    return pd.read_sql(query, con=engine)
+    try:
+        engine = get_engine()
+        query = """
+            SELECT 
+                w.weather_condition,
+                w.weather_risk_level,
+                w.temperature_c,
+                w.precipitation_mm,
+                w.visibility_m,
+                r.road_type,
+                r.speed_limit,
+                r.light_conditions,
+                r.road_surface_conditions,
+                s.severity_name,
+                f.number_of_casualties
+            FROM fact_accidents f
+            JOIN dim_road r ON f.road_key = r.road_key
+            JOIN dim_weather w ON f.weather_key = w.weather_key
+            JOIN dim_severity s ON f.severity_key = s.severity_key
+        """
+        df = pd.read_sql(query, con=engine)
+        if not df.empty:
+            return df
+    except Exception:
+        pass
+    from streamlit_app.demo_data import generate_demo_dataframe
+    return generate_demo_dataframe(n=2000)
 
 
 df = load_environmental_data()

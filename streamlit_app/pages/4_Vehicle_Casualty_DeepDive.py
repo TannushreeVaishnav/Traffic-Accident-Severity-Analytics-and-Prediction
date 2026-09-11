@@ -21,21 +21,28 @@ st.markdown("Investigate the relationship between multi-vehicle pileups, casualt
 
 @st.cache_data(ttl=60)
 def load_vehicle_data():
-    engine = get_engine()
-    query = """
-        SELECT 
-            f.number_of_vehicles,
-            f.number_of_casualties,
-            r.road_type,
-            r.speed_limit,
-            s.severity_name,
-            l.urban_or_rural
-        FROM fact_accidents f
-        JOIN dim_road r ON f.road_key = r.road_key
-        JOIN dim_severity s ON f.severity_key = s.severity_key
-        JOIN dim_location l ON f.location_key = l.location_key
-    """
-    return pd.read_sql(query, con=engine)
+    try:
+        engine = get_engine()
+        query = """
+            SELECT 
+                f.number_of_vehicles,
+                f.number_of_casualties,
+                r.road_type,
+                r.speed_limit,
+                s.severity_name,
+                l.urban_or_rural
+            FROM fact_accidents f
+            JOIN dim_road r ON f.road_key = r.road_key
+            JOIN dim_severity s ON f.severity_key = s.severity_key
+            JOIN dim_location l ON f.location_key = l.location_key
+        """
+        df = pd.read_sql(query, con=engine)
+        if not df.empty:
+            return df
+    except Exception:
+        pass
+    from streamlit_app.demo_data import generate_demo_dataframe
+    return generate_demo_dataframe(n=2000)
 
 
 df = load_vehicle_data()

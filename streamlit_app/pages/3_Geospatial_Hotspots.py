@@ -22,22 +22,29 @@ st.markdown("Locate high-frequency accident zones and explore spatial severity d
 
 @st.cache_data(ttl=60)
 def load_geospatial_data():
-    engine = get_engine()
-    query = """
-        SELECT 
-            l.latitude,
-            l.longitude,
-            l.urban_or_rural,
-            l.local_authority,
-            s.severity_name,
-            f.number_of_casualties,
-            f.number_of_vehicles
-        FROM fact_accidents f
-        JOIN dim_location l ON f.location_key = l.location_key
-        JOIN dim_severity s ON f.severity_key = s.severity_key
-        WHERE l.latitude IS NOT NULL AND l.longitude IS NOT NULL
-    """
-    return pd.read_sql(query, con=engine)
+    try:
+        engine = get_engine()
+        query = """
+            SELECT 
+                l.latitude,
+                l.longitude,
+                l.urban_or_rural,
+                l.local_authority,
+                s.severity_name,
+                f.number_of_casualties,
+                f.number_of_vehicles
+            FROM fact_accidents f
+            JOIN dim_location l ON f.location_key = l.location_key
+            JOIN dim_severity s ON f.severity_key = s.severity_key
+            WHERE l.latitude IS NOT NULL AND l.longitude IS NOT NULL
+        """
+        df = pd.read_sql(query, con=engine)
+        if not df.empty:
+            return df
+    except Exception:
+        pass
+    from streamlit_app.demo_data import generate_demo_dataframe
+    return generate_demo_dataframe(n=2000)
 
 
 df = load_geospatial_data()

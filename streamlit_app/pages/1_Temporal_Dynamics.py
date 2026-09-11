@@ -21,22 +21,29 @@ st.markdown("Analyze how accident incidence fluctuates across hours of the day, 
 
 @st.cache_data(ttl=60)
 def load_temporal_data():
-    engine = get_engine()
-    query = """
-        SELECT 
-            d.day_name,
-            d.day_of_week,
-            d.hour,
-            d.time_of_day,
-            d.is_weekend,
-            d.month_name,
-            s.severity_name,
-            f.number_of_casualties
-        FROM fact_accidents f
-        JOIN dim_date d ON f.date_key = d.date_key
-        JOIN dim_severity s ON f.severity_key = s.severity_key
-    """
-    return pd.read_sql(query, con=engine)
+    try:
+        engine = get_engine()
+        query = """
+            SELECT 
+                d.day_name,
+                d.day_of_week,
+                d.hour,
+                d.time_of_day,
+                d.is_weekend,
+                d.month_name,
+                s.severity_name,
+                f.number_of_casualties
+            FROM fact_accidents f
+            JOIN dim_date d ON f.date_key = d.date_key
+            JOIN dim_severity s ON f.severity_key = s.severity_key
+        """
+        df = pd.read_sql(query, con=engine)
+        if not df.empty:
+            return df
+    except Exception:
+        pass
+    from streamlit_app.demo_data import generate_demo_dataframe
+    return generate_demo_dataframe(n=2000)
 
 
 df = load_temporal_data()

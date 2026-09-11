@@ -32,8 +32,12 @@ lib64/
 data/raw/
 data/processed/
 data/quarantine/
+data/rejected/
 data/*.db
 data/*.sqlite
+
+# Local docs / assignments
+*.pdf
 
 # SQLite databases
 *.db
@@ -43,13 +47,11 @@ data/*.sqlite
 mlruns/
 
 # Trained model files (large binaries)
-models/*.joblib
 models/*.pkl
 models/*.pt
 models/*.h5
 
 # Reports (generated at runtime)
-reports/*.json
 reports/*.html
 
 # Docker volumes & caches

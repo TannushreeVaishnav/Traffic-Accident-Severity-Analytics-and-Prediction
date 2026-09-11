@@ -7,10 +7,6 @@ psycopg2-binary>=2.9.9
 pydantic>=2.5.0
 python-dotenv>=1.0.0
 
-# Geospatial & Analytics
-geopandas>=0.14.0
-shapely>=2.0.0
-
 # Visualization & Dashboard
 streamlit>=1.30.0
 plotly>=5.18.0
@@ -32,4 +28,3 @@ uvicorn>=0.27.0
 evidently>=0.4.15
 pytest>=7.4.0
 httpx>=0.26.0
-mlflow
