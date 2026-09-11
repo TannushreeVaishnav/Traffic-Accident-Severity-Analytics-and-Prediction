@@ -10,6 +10,7 @@ import datetime
 
 def generate_demo_dataframe(n: int = 2000, seed: int = 42) -> pd.DataFrame:
     np.random.seed(seed)
+    norm_p = lambda arr: np.array(arr, dtype=float) / np.sum(arr)
 
     cities = [
         {"name": "London",     "lat": 51.5074, "lon": -0.1278,  "authority": "Greater London Authority"},
@@ -18,38 +19,46 @@ def generate_demo_dataframe(n: int = 2000, seed: int = 42) -> pd.DataFrame:
         {"name": "Leeds",      "lat": 53.8008, "lon": -1.5491,  "authority": "Leeds City Council"},
         {"name": "Glasgow",    "lat": 55.8642, "lon": -4.2518,  "authority": "Glasgow City Council"},
     ]
-    city_choices = np.random.choice(cities, size=n)
+    city_indices = np.random.choice(len(cities), size=n)
+    city_choices = [cities[i] for i in city_indices]
 
     base = datetime.date(2024, 1, 1)
     dates = [base + datetime.timedelta(days=int(d)) for d in np.random.randint(0, 730, n)]
-    hours = np.random.choice(range(24), n,
-        p=np.array([.015,.010,.008,.007,.010,.020,.050,.080,.090,.060,
-                    .050,.050,.060,.060,.060,.070,.090,.090,.070,.050,
-                    .040,.030,.020,.020]) / 1.0)
+    
+    hours_raw = [
+        .015, .010, .008, .007, .010, .020, .050, .080, .090, .060,
+        .050, .050, .060, .060, .060, .070, .090, .090, .070, .050,
+        .040, .030, .020, .020
+    ]
+    hours = np.random.choice(range(24), n, p=norm_p(hours_raw))
 
-    severity_names = np.random.choice(["Fatal","Serious","Slight"], n, p=[0.025, 0.185, 0.790])
+    severity_names = np.random.choice(["Fatal", "Serious", "Slight"], n, p=norm_p([0.025, 0.185, 0.790]))
     severity_codes = {"Fatal": 1, "Serious": 2, "Slight": 3}
 
     road_types = np.random.choice(
-        ["Single carriageway","Dual carriageway","Roundabout","One way street","Slip road"],
-        n, p=[0.70,0.18,0.06,0.04,0.02])
-    speed_limits = np.random.choice([20,30,40,50,60,70], n, p=[0.10,0.60,0.10,0.05,0.08,0.07])
+        ["Single carriageway", "Dual carriageway", "Roundabout", "One way street", "Slip road"],
+        n, p=norm_p([0.70, 0.18, 0.06, 0.04, 0.02])
+    )
+    speed_limits = np.random.choice([20, 30, 40, 50, 60, 70], n, p=norm_p([0.10, 0.60, 0.10, 0.05, 0.08, 0.07]))
     light_conds  = np.random.choice(
-        ["Daylight","Darkness - lights lit","Darkness - lights unlit","Darkness - no lighting"],
-        n, p=[0.72,0.20,0.03,0.05])
+        ["Daylight", "Darkness - lights lit", "Darkness - lights unlit", "Darkness - no lighting"],
+        n, p=norm_p([0.72, 0.20, 0.03, 0.05])
+    )
     road_surfs   = np.random.choice(
-        ["Dry","Wet or damp","Frost or ice","Snow","Flood over 3cm"],
-        n, p=[0.68,0.26,0.04,0.015,0.005])
+        ["Dry", "Wet or damp", "Frost or ice", "Snow", "Flood over 3cm"],
+        n, p=norm_p([0.68, 0.26, 0.04, 0.015, 0.005])
+    )
     weather_conds = np.random.choice(
-        ["Fine no high winds","Raining no high winds","Raining + high winds","Fog or mist","Snowing"],
-        n, p=[0.75,0.16,0.04,0.03,0.02])
+        ["Fine no high winds", "Raining no high winds", "Raining + high winds", "Fog or mist", "Snowing"],
+        n, p=norm_p([0.75, 0.16, 0.04, 0.03, 0.02])
+    )
     weather_risk  = [
         "Severe" if "Snow" in w or "Fog" in w else ("Moderate" if "Rain" in w else "Low")
         for w in weather_conds
     ]
-    urban_rural   = np.random.choice(["Urban","Rural"], n, p=[0.65,0.35])
-    vehicles      = np.random.choice([1,2,3,4], n, p=[0.35,0.55,0.08,0.02])
-    casualties    = np.random.choice([1,2,3,4], n, p=[0.78,0.16,0.04,0.02])
+    urban_rural   = np.random.choice(["Urban", "Rural"], n, p=norm_p([0.65, 0.35]))
+    vehicles      = np.random.choice([1, 2, 3, 4], n, p=norm_p([0.35, 0.55, 0.08, 0.02]))
+    casualties    = np.random.choice([1, 2, 3, 4], n, p=norm_p([0.78, 0.16, 0.04, 0.02]))
 
     tod_map = lambda h: (
         "Morning Rush" if 6  <= h < 10 else
