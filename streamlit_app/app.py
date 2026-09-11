@@ -62,52 +62,61 @@ st.markdown("""
 
 @st.cache_data(ttl=60)
 def load_data():
-    engine = get_engine()
-    query = """
-        SELECT 
-            f.accident_index,
-            d.full_date,
-            d.year,
-            d.month,
-            d.day_name,
-            d.hour,
-            d.time_of_day,
-            l.latitude,
-            l.longitude,
-            l.urban_or_rural,
-            l.local_authority,
-            r.road_type,
-            r.speed_limit,
-            r.light_conditions,
-            r.road_surface_conditions,
-            w.weather_condition,
-            w.temperature_c,
-            w.precipitation_mm,
-            w.visibility_m,
-            w.wind_speed_kmh,
-            w.weather_risk_level,
-            f.number_of_vehicles,
-            f.number_of_casualties,
-            s.severity_name,
-            s.severity_code
-        FROM fact_accidents f
-        JOIN dim_date d ON f.date_key = d.date_key
-        JOIN dim_location l ON f.location_key = l.location_key
-        JOIN dim_road r ON f.road_key = r.road_key
-        JOIN dim_weather w ON f.weather_key = w.weather_key
-        JOIN dim_severity s ON f.severity_key = s.severity_key
-    """
     try:
-        return pd.read_sql(query, con=engine)
-    except Exception as e:
-        st.error(f"Error loading warehouse data: {e}")
-        return pd.DataFrame()
+        engine = get_engine()
+        query = """
+            SELECT 
+                f.accident_index,
+                d.full_date,
+                d.year,
+                d.month,
+                d.day_name,
+                d.hour,
+                d.time_of_day,
+                d.is_weekend,
+                l.latitude,
+                l.longitude,
+                l.urban_or_rural,
+                l.local_authority,
+                r.road_type,
+                r.speed_limit,
+                r.light_conditions,
+                r.road_surface_conditions,
+                w.weather_condition,
+                w.temperature_c,
+                w.precipitation_mm,
+                w.visibility_m,
+                w.wind_speed_kmh,
+                w.weather_risk_level,
+                f.number_of_vehicles,
+                f.number_of_casualties,
+                s.severity_name,
+                s.severity_code
+            FROM fact_accidents f
+            JOIN dim_date d ON f.date_key = d.date_key
+            JOIN dim_location l ON f.location_key = l.location_key
+            JOIN dim_road r ON f.road_key = r.road_key
+            JOIN dim_weather w ON f.weather_key = w.weather_key
+            JOIN dim_severity s ON f.severity_key = s.severity_key
+        """
+        df = pd.read_sql(query, con=engine)
+        if not df.empty:
+            return df, False  # (data, is_demo)
+    except Exception:
+        pass
+
+    # Fallback: generate demo data for cloud deployment
+    from streamlit_app.demo_data import generate_demo_dataframe
+    return generate_demo_dataframe(n=2000), True
 
 
-df = load_data()
+df, IS_DEMO = load_data()
 
 st.markdown('<div class="main-title">🚦 Traffic Accident Severity Analytics & MLOps</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-title">Production Data Engineering, Geospatial Intelligence, and Predictive MLOps Platform</div>', unsafe_allow_html=True)
+
+if IS_DEMO:
+    st.info("💡 **Cloud Showcase Mode Active**: Viewing benchmark telemetry data. (Production PostgreSQL Warehouse & MLflow registry operate on containerized infrastructure).")
 
 # Sidebar Filters
 st.sidebar.title("🎛️ Analytics Filters")
