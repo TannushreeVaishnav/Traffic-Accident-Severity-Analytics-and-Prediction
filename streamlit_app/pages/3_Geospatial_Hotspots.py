@@ -14,9 +14,9 @@ import pydeck as pdk
 import plotly.express as px
 from src.etl.db import get_engine
 
-st.set_page_config(page_title="Geospatial Hotspots | Traffic Analytics", page_icon="🗺️", layout="wide")
+st.set_page_config(page_title="Geospatial Hotspots | Traffic Analytics", layout="wide")
 
-st.title("🗺️ Geospatial Intelligence & Accident Hotspots")
+st.title("Geospatial Hotspots & Regional Density Analysis")
 st.markdown("Locate high-frequency accident zones and explore spatial severity distributions across regional clusters.")
 
 
@@ -66,7 +66,7 @@ else:
     plot_df = df[df["severity_name"].isin(selected_sev)]
     
     # PyDeck Map
-    st.subheader(f"📍 Interactive Spatial Density Map ({len(plot_df):,} Points)")
+    st.subheader(f"Spatial Density Map ({len(plot_df):,} Points)")
     
     mid_lat = plot_df["latitude"].mean()
     mid_lon = plot_df["longitude"].mean()
@@ -111,7 +111,7 @@ else:
     st.divider()
     
     # Hotspot Authorities Ranking
-    st.subheader("🏛️ Top Local Authorities by Accident Frequency")
+    st.subheader("Top Local Authorities by Incident Volume")
     auth_summary = plot_df.groupby("local_authority").agg(
         Total_Accidents=("latitude", "count"),
         Fatalities=("severity_name", lambda x: (x == "Fatal").sum()),

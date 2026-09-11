@@ -15,18 +15,18 @@ import pandas as pd
 from src.etl.db import get_engine
 from src.monitoring.drift_detector import run_drift_analysis
 
-st.set_page_config(page_title="Pipeline Audit & Drift | MLOps", page_icon="🛡️", layout="wide")
+st.set_page_config(page_title="Pipeline Audit & Drift | MLOps", layout="wide")
 
-st.title("🛡️ Data Engineering Audit & Drift Monitoring")
+st.title("Data Engineering Audit & Drift Monitoring")
 st.markdown("Inspect ingestion pipeline audit traces, data quality quarantine records, and statistical drift indicators.")
 
 engine = get_engine()
 
 tab1, tab2, tab3, tab4 = st.tabs([
-    "📋 Ingestion Audit Trail", 
-    "🚫 Quarantined Rejections", 
-    "📈 Data & Concept Drift",
-    "🔄 Airflow Automated Pipeline"
+    "Ingestion Audit Trail", 
+    "Quarantine Rejection Log", 
+    "Statistical Drift Monitoring",
+    "Airflow Orchestration"
 ])
 
 with tab1:
@@ -83,14 +83,14 @@ with tab3:
     st.subheader("Statistical Drift Detection & Retraining Triggers")
     st.markdown("Evaluates distribution shifts between baseline reference data and recent production records.")
     
-    if st.button("🔄 Run On-Demand Drift Analysis", key="run_drift"):
+    if st.button("Run Drift Analysis", key="run_drift"):
         with st.spinner("Calculating PSI and Kolmogorov-Smirnov statistics..."):
             try:
                 report = run_drift_analysis()
                 st.session_state["drift_report"] = report
-                st.success("Drift analysis updated successfully!")
+                st.success("Drift analysis updated successfully.")
             except Exception:
-                st.info("💡 Running in cloud demo mode: displaying pre-computed baseline drift report.")
+                st.info("Demonstration Mode: Displaying baseline reference drift report.")
             
     # Load latest report or run if not present
     report = st.session_state.get("drift_report")

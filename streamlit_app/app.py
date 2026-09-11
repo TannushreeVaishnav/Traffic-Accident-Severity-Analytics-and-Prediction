@@ -112,14 +112,14 @@ def load_data():
 
 df, IS_DEMO = load_data()
 
-st.markdown('<div class="main-title">🚦 Traffic Accident Severity Analytics & MLOps</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">Production Data Engineering, Geospatial Intelligence, and Predictive MLOps Platform</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">Traffic Accident Severity Analytics Platform</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">Data Engineering, Geospatial Analytics, and Predictive MLOps</div>', unsafe_allow_html=True)
 
 if IS_DEMO:
-    st.info("💡 **Cloud Showcase Mode Active**: Viewing benchmark telemetry data. (Production PostgreSQL Warehouse & MLflow registry operate on containerized infrastructure).")
+    st.info("Demonstration Mode: Viewing benchmark telemetry data. In the full production environment, the pipeline connects to the containerized PostgreSQL star schema and MLflow tracking service.")
 
 # Sidebar Filters
-st.sidebar.title("🎛️ Analytics Filters")
+st.sidebar.title("Filters")
 if not df.empty:
     selected_urban = st.sidebar.multiselect("Area Type", options=sorted(df["urban_or_rural"].unique()), default=list(df["urban_or_rural"].unique()))
     selected_severities = st.sidebar.multiselect("Severity Level", options=sorted(df["severity_name"].unique()), default=list(df["severity_name"].unique()))
@@ -151,7 +151,7 @@ if not filtered_df.empty:
     with col4:
         st.markdown(f'<div class="metric-card"><div class="metric-lbl">Total Casualties</div><div class="metric-val" style="color:#10B981;">{total_casualties:,}</div></div>', unsafe_allow_html=True)
     with col5:
-        st.markdown(f'<div class="metric-card"><div class="metric-lbl">Avg Vehicles / Crash</div><div class="metric-val" style="color:#A855F7;">{avg_vehicles}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric-card"><div class="metric-lbl">Avg Vehicles / Incident</div><div class="metric-val" style="color:#A855F7;">{avg_vehicles}</div></div>', unsafe_allow_html=True)
 
     st.write("")
     
@@ -159,7 +159,7 @@ if not filtered_df.empty:
     c_left, c_right = st.columns([1.2, 1])
     
     with c_left:
-        st.subheader("📊 Severity Proportion & Class Distribution")
+        st.subheader("Severity Proportion & Class Distribution")
         sev_counts = filtered_df["severity_name"].value_counts().reset_index()
         sev_counts.columns = ["Severity", "Count"]
         color_map = {"Fatal": "#EF4444", "Serious": "#F59E0B", "Slight": "#38BDF8"}
@@ -177,7 +177,7 @@ if not filtered_df.empty:
         st.plotly_chart(fig_donut, use_container_width=True)
         
     with c_right:
-        st.subheader("🏙️ Severity by Urban vs. Rural Area")
+        st.subheader("Severity Distribution by Area Type")
         urban_sev = filtered_df.groupby(["urban_or_rural", "severity_name"]).size().reset_index(name="Accidents")
         fig_bar = px.bar(
             urban_sev,
@@ -193,21 +193,22 @@ if not filtered_df.empty:
 
     # Architectural Overview Section
     st.divider()
-    st.subheader("🏗️ Architecture & Pipeline Flow")
+    st.subheader("System Architecture & Data Pipeline")
     st.markdown("""
-    This platform operates an enterprise-grade dual-tier architecture:
+    This platform operates a dual-tier architecture:
     1. **Data Engineering Layer**:
-       - **Automated Ingestion**: Scheduled extracts from UK Road Safety benchmark records + real-time atmospheric variables via **Open-Meteo API**.
-       - **Quarantine & DQ**: Schema validation quarantines corrupted records with audit traces before warehouse loading.
-       - **Dimensional Star Schema**: Relational storage in **PostgreSQL / PostGIS** with dimensional models (`Dim_Date`, `Dim_Location`, `Dim_Road`, `Dim_Weather`, `Dim_Severity`) and aggregate marts.
-       - **Orchestration**: Orchestrated end-to-end via **Apache Airflow**.
+       - **Automated Ingestion**: Scheduled extracts from UK Road Safety benchmark records enriched with atmospheric variables from the **Open-Meteo API**.
+       - **Quarantine & Validation**: Schema checks quarantine invalid coordinates or corrupted fields with audit logging prior to loading.
+       - **Dimensional Star Schema**: Relational warehouse in **PostgreSQL / PostGIS** with dimensional models (`dim_date`, `dim_location`, `dim_road`, `dim_weather`, `dim_severity`) and aggregate marts.
+       - **Orchestration**: Managed end-to-end via **Apache Airflow DAGs**.
     2. **MLOps Predictive Layer**:
-       - **Severe Class Imbalance Handling**: Weighted cost functions and resampled boundary training.
-       - **Experiment Tracking**: **MLflow** versioning parameters, macro-F1, and confusion matrices.
-       - **Serving & Microservices**: Low-latency REST endpoints via **FastAPI** & **Docker**.
-       - **Continuous Drift Monitoring**: Real-time statistical drift tracking (PSI & Kolmogorov-Smirnov) to detect covariate shift and trigger retraining.
+       - **Class Imbalance Handling**: Cost-sensitive weighting and boundary sampling for rare fatal collisions (<3%).
+       - **Experiment Tracking**: **MLflow** tracks parameters, macro-F1 metrics, and confusion matrix artifacts.
+       - **Model Serving**: REST API endpoints implemented with **FastAPI**.
+       - **Continuous Drift Monitoring**: Real-time statistical drift tracking (PSI and Kolmogorov-Smirnov) to detect covariate shift.
     """)
     
-    st.info("💡 **Navigation Tip**: Use the sidebar to explore detailed Temporal Dynamics, Environmental Risk, Geospatial Hotspots, Vehicle/Casualty Analysis, Live MLOps Predictions, and Ingestion Audit Logs.")
+    st.caption("Use the sidebar pages to inspect Temporal Dynamics, Environmental Risk, Geospatial Hotspots, Vehicle/Casualty Analysis, Live Inference, and Pipeline Audit/Drift Monitoring.")
 else:
     st.warning("No data found in warehouse. Please run the ETL ingestion pipeline first (`python src/etl/transform.py`).")
+

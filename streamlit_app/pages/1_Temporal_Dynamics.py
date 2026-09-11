@@ -13,9 +13,9 @@ import pandas as pd
 import plotly.express as px
 from src.etl.db import get_engine
 
-st.set_page_config(page_title="Temporal Dynamics | Traffic Analytics", page_icon="⏰", layout="wide")
+st.set_page_config(page_title="Temporal Dynamics | Traffic Analytics", layout="wide")
 
-st.title("⏰ Temporal Dynamics & Accident Patterns")
+st.title("Temporal Dynamics & Accident Patterns")
 st.markdown("Analyze how accident incidence fluctuates across hours of the day, weekdays vs. weekends, and rush hour peaks.")
 
 
@@ -52,7 +52,7 @@ if df.empty:
     st.warning("No data available.")
 else:
     # 1. 2D Heatmap: Day of Week vs Hour of Day
-    st.subheader("🔥 Heatmap: Accident Concentration (Hour vs. Day)")
+    st.subheader("Incident Density by Hour and Day of Week")
     
     day_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     pivot_df = df.pivot_table(index="day_name", columns="hour", values="number_of_casualties", aggfunc="count", fill_value=0)
@@ -73,7 +73,7 @@ else:
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("🚗 Accidents by Time-of-Day Window")
+        st.subheader("Incidents by Time-of-Day Window")
         tod_counts = df.groupby(["time_of_day", "severity_name"]).size().reset_index(name="Accident Count")
         tod_order = ["Morning Rush", "Midday", "Evening Rush", "Night"]
         fig_tod = px.bar(
@@ -88,7 +88,7 @@ else:
         st.plotly_chart(fig_tod, use_container_width=True)
         
     with col2:
-        st.subheader("📅 Weekend vs. Weekday Casualties")
+        st.subheader("Casualty Comparison: Weekday vs. Weekend")
         df["Weekend_Label"] = df["is_weekend"].map(
             lambda x: "Weekend (Sat-Sun)" if x in [True, 1, "true", "True", "1"] else "Weekday (Mon-Fri)"
         )

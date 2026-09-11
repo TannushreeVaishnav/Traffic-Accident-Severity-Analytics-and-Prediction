@@ -13,9 +13,9 @@ import pandas as pd
 import plotly.express as px
 from src.etl.db import get_engine
 
-st.set_page_config(page_title="Vehicle & Casualty Analysis | Traffic Analytics", page_icon="🚘", layout="wide")
+st.set_page_config(page_title="Vehicle & Casualty Analysis | Traffic Analytics", layout="wide")
 
-st.title("🚘 Vehicle & Casualty Analysis")
+st.title("Vehicle & Casualty Analysis")
 st.markdown("Investigate the relationship between multi-vehicle pileups, casualty rates, and final severity outcomes.")
 
 
@@ -53,7 +53,7 @@ else:
     c1, c2 = st.columns(2)
     
     with c1:
-        st.subheader("🚗 Vehicle Count vs. Severity Outcome")
+        st.subheader("Vehicle Count vs. Severity Outcome")
         veh_summary = df.groupby(["number_of_vehicles", "severity_name"]).size().reset_index(name="Accidents")
         fig_veh = px.bar(
             veh_summary,
@@ -66,7 +66,7 @@ else:
         st.plotly_chart(fig_veh, use_container_width=True)
         
     with c2:
-        st.subheader("👥 Casualty Count Distribution")
+        st.subheader("Casualty Count Distribution")
         cas_summary = df.groupby(["number_of_casualties", "severity_name"]).size().reset_index(name="Accidents")
         fig_cas = px.bar(
             cas_summary,
@@ -80,7 +80,7 @@ else:
         
     st.divider()
     
-    st.subheader("🛣️ Multi-Vehicle Accidents by Road Classification")
+    st.subheader("Multi-Vehicle Incidents by Road Classification")
     road_veh = df.groupby(["road_type", "number_of_vehicles"]).size().reset_index(name="Accident Count")
     fig_road_veh = px.sunburst(
         road_veh,

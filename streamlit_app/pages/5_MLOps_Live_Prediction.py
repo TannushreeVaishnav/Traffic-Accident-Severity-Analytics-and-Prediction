@@ -16,9 +16,9 @@ import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
 
-st.set_page_config(page_title="Live Prediction | MLOps", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="Live Prediction | MLOps", layout="wide")
 
-st.title("🤖 Live Accident Severity Inference")
+st.title("Accident Severity Prediction & Inference")
 st.markdown("Simulate crash conditions and compute instant severity classification & risk scores using the operationalized model.")
 
 MODEL_PATH = Path("models/accident_severity_model.joblib")
@@ -107,30 +107,30 @@ def load_model_metrics():
 model_pipeline = load_production_pipeline()
 model_metrics = load_model_metrics()
 
-# Prominent Metric Banner
+# Metrics Banner
 m1, m2, m3, m4 = st.columns(4)
 overall_acc = model_metrics.get("overall_accuracy", model_metrics.get("accuracy", 0.792))
 macro_f1 = model_metrics.get("macro avg", {}).get("f1-score", 0.32)
 
 with m1:
-    st.metric("🎯 Overall Model Accuracy", f"{overall_acc * 100:.1f}%", help="Total percentage of correctly predicted accidents across all severity classes.")
+    st.metric("Overall Model Accuracy", f"{overall_acc * 100:.1f}%", help="Percentage of correctly classified test incidents across all severity classes.")
 with m2:
-    st.metric("⚖️ Balanced Macro-F1", f"{macro_f1:.2f}", help="Unweighted mean of F1 scores giving equal importance to rare Fatal (<2%) and Serious crashes.")
+    st.metric("Balanced Macro-F1", f"{macro_f1:.2f}", help="Unweighted harmonic mean of precision and recall giving equal evaluation weight to fatal and serious categories.")
 with m3:
-    st.metric("🧬 Imbalance Handling", "SMOTE Enabled", help="Synthetic Minority Over-sampling Technique applied to boost minority Fatal crash learning.")
+    st.metric("Class Imbalance Strategy", "SMOTE Resampling", help="Synthetic Minority Over-sampling Technique applied to balance the fatal crash minority distribution.")
 with m4:
     champion_name = model_metrics.get("champion_model", "LightGBM")
-    st.metric("🏆 Champion Model", champion_name, help="Best-performing classifier selected and registered in MLflow.")
+    st.metric("Production Champion", champion_name, help="Selected best-performing model logged in MLflow registry.")
 
 st.divider()
 
 if model_pipeline is None:
-    st.error("⚠️ Production model artifact not found. Please train model first via `python src/ml/train.py`.")
+    st.error("Production model artifact not found. Please train model first via `python src/ml/train.py`.")
 else:
     col_input, col_pred = st.columns([1.1, 1.2])
     
     with col_input:
-        st.subheader("⚙️ Scenario Input Parameters")
+        st.subheader("Scenario Input Parameters")
         
         c1, c2 = st.columns(2)
         with c1:
@@ -156,7 +156,7 @@ else:
             num_casualties = st.number_input("Casualties Involved", min_value=1, max_value=10, value=1)
             
         st.divider()
-        with st.expander("🌡️ Advanced Environmental Variables"):
+        with st.expander("Atmospheric & Weather Variables"):
             temp = st.slider("Temperature (°C)", -10.0, 35.0, 8.5)
             precip = st.slider("Precipitation (mm)", 0.0, 20.0, 2.5)
             vis = st.slider("Visibility (meters)", 100.0, 20000.0, 4500.0)
@@ -164,7 +164,7 @@ else:
 
     # Inference logic
     with col_pred:
-        st.subheader("🎯 Real-Time Prediction Outcome")
+        st.subheader("Real-Time Prediction Outcome")
         
         # Determine time of day
         if 6 <= hour < 10:

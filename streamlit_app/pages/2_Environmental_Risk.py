@@ -13,9 +13,9 @@ import pandas as pd
 import plotly.express as px
 from src.etl.db import get_engine
 
-st.set_page_config(page_title="Environmental Risk | Traffic Analytics", page_icon="🌧️", layout="wide")
+st.set_page_config(page_title="Environmental Risk | Traffic Analytics", layout="wide")
 
-st.title("🌧️ Environmental & Road Surface Impact")
+st.title("Environmental & Road Surface Analysis")
 st.markdown("Examine how adverse weather conditions, lighting, and road surfaces correlate with accident severity.")
 
 
@@ -58,7 +58,7 @@ else:
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("🌦️ Accident Volume by Weather Condition")
+        st.subheader("Incident Volume by Weather Condition")
         wea_summary = df.groupby(["weather_condition", "severity_name"]).size().reset_index(name="Accidents")
         fig_wea = px.bar(
             wea_summary,
@@ -72,7 +72,7 @@ else:
         st.plotly_chart(fig_wea, use_container_width=True)
         
     with col2:
-        st.subheader("🛣️ Road Surface Conditions vs Severity")
+        st.subheader("Road Surface Conditions vs. Severity")
         surface_summary = df.groupby(["road_surface_conditions", "severity_name"]).size().reset_index(name="Accidents")
         fig_surf = px.bar(
             surface_summary,
@@ -89,7 +89,7 @@ else:
     
     col3, col4 = st.columns(2)
     with col3:
-        st.subheader("⚡ Speed Limit vs. High Severity Probability")
+        st.subheader("Speed Limit vs. High Severity Rate")
         speed_sev = df.groupby("speed_limit")["severity_name"].value_counts(normalize=True).unstack().fillna(0)
         if "Fatal" in speed_sev.columns:
             speed_sev["Fatal_Pct"] = speed_sev["Fatal"] * 100
@@ -113,7 +113,7 @@ else:
         st.plotly_chart(fig_speed, use_container_width=True)
         
     with col4:
-        st.subheader("💡 Light Conditions & Visibility")
+        st.subheader("Lighting Conditions Impact")
         light_summary = df.groupby(["light_conditions", "severity_name"]).size().reset_index(name="Accidents")
         fig_light = px.bar(
             light_summary,
