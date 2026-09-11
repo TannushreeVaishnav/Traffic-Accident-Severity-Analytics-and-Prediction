@@ -187,5 +187,3 @@ http://localhost:8080
 # 3. Default Login Credentials:
 Username: admin
 Password: admin""", language="bash")
-        
-        st.info("💡 **Local execution**: In non-containerized environments, all tasks can also be tested sequentially using `python src/etl/transform.py` and `python src/monitoring/drift_detector.py`.")

@@ -75,7 +75,7 @@ def run_etl_pipeline(batch_id: str = None):
     df["day_of_month"] = df["dt"].dt.day
     df["day_of_week"] = df["dt"].dt.dayofweek
     df["day_name"] = df["dt"].dt.strftime("%A")
-    df["is_weekend"] = df["day_of_week"].isin([5, 6]).astype(int)
+    df["is_weekend"] = df["day_of_week"].isin([5, 6]).astype(bool)
     df["hour"] = df["dt"].dt.hour
     df["time_of_day"] = df["hour"].apply(time_of_day_bucket)
     df["date_key"] = df["dt"].apply(lambda x: int(x.strftime("%Y%m%d%H")))
@@ -120,6 +120,10 @@ def run_etl_pipeline(batch_id: str = None):
                 text("""
                     INSERT INTO dim_location (latitude, longitude, urban_or_rural, local_authority, region)
                     VALUES (:latitude, :longitude, :urban_or_rural, :local_authority, :region)
+                """ if "sqlite" in str(engine.url) else """
+                    INSERT INTO dim_location (latitude, longitude, urban_or_rural, local_authority, region)
+                    VALUES (:latitude, :longitude, :urban_or_rural, :local_authority, :region)
+                    ON CONFLICT DO NOTHING;
                 """),
                 row.to_dict()
             )
@@ -136,6 +140,10 @@ def run_etl_pipeline(batch_id: str = None):
                 text("""
                     INSERT INTO dim_road (road_type, speed_limit, light_conditions, road_surface_conditions)
                     VALUES (:road_type, :speed_limit, :light_conditions, :road_surface_conditions)
+                """ if "sqlite" in str(engine.url) else """
+                    INSERT INTO dim_road (road_type, speed_limit, light_conditions, road_surface_conditions)
+                    VALUES (:road_type, :speed_limit, :light_conditions, :road_surface_conditions)
+                    ON CONFLICT DO NOTHING;
                 """),
                 row.to_dict()
             )
@@ -171,6 +179,10 @@ def run_etl_pipeline(batch_id: str = None):
                 text("""
                     INSERT INTO dim_weather (weather_condition, temperature_c, precipitation_mm, visibility_m, wind_speed_kmh, weather_risk_level)
                     VALUES (:weather_condition, :temperature_c, :precipitation_mm, :visibility_m, :wind_speed_kmh, :weather_risk_level)
+                """ if "sqlite" in str(engine.url) else """
+                    INSERT INTO dim_weather (weather_condition, temperature_c, precipitation_mm, visibility_m, wind_speed_kmh, weather_risk_level)
+                    VALUES (:weather_condition, :temperature_c, :precipitation_mm, :visibility_m, :wind_speed_kmh, :weather_risk_level)
+                    ON CONFLICT DO NOTHING;
                 """),
                 row.to_dict()
             )
@@ -215,6 +227,10 @@ def run_etl_pipeline(batch_id: str = None):
                 except Exception as ex:
                     logger.debug(f"Mart refresh notice: {ex}")
                     
+    # Clear processed staging records to prevent reprocessing on next run
+    with engine.begin() as conn:
+        conn.execute(text("DELETE FROM stg_accidents_raw"))
+    logger.info("Staging table cleared after successful ETL load.")
     logger.info("ETL transformation, star schema load, and analytical marts refresh complete!")
 
 

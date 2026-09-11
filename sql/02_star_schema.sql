@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS dim_location (
     longitude NUMERIC(10, 6) NOT NULL,
     urban_or_rural VARCHAR(32),
     local_authority VARCHAR(128),
-    region VARCHAR(64)
+    region VARCHAR(64),
+    UNIQUE (latitude, longitude, urban_or_rural, local_authority)
 );
 
 -- Dim Road
@@ -33,13 +34,14 @@ CREATE TABLE IF NOT EXISTS dim_road (
     road_type VARCHAR(64) NOT NULL,
     speed_limit INT NOT NULL,
     light_conditions VARCHAR(128) NOT NULL,
-    road_surface_conditions VARCHAR(128) NOT NULL
+    road_surface_conditions VARCHAR(128) NOT NULL,
+    UNIQUE (road_type, speed_limit, light_conditions, road_surface_conditions)
 );
 
 -- Dim Weather
 CREATE TABLE IF NOT EXISTS dim_weather (
     weather_key SERIAL PRIMARY KEY,
-    weather_condition VARCHAR(128) NOT NULL,
+    weather_condition VARCHAR(128) NOT NULL UNIQUE,
     temperature_c NUMERIC(5, 2),
     precipitation_mm NUMERIC(5, 2),
     visibility_m NUMERIC(8, 2),

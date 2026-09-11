@@ -82,7 +82,9 @@ else:
         
     with col2:
         st.subheader("📅 Weekend vs. Weekday Casualties")
-        df["Weekend_Label"] = df["is_weekend"].map({1: "Weekend (Sat-Sun)", 0: "Weekday (Mon-Fri)"})
+        df["Weekend_Label"] = df["is_weekend"].map(
+            lambda x: "Weekend (Sat-Sun)" if x in [True, 1, "true", "True", "1"] else "Weekday (Mon-Fri)"
+        )
         wk_summary = df.groupby(["Weekend_Label", "severity_name"])["number_of_casualties"].sum().reset_index()
         fig_wk = px.bar(
             wk_summary,
