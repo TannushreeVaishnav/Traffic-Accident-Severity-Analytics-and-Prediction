@@ -249,6 +249,7 @@ def train_and_evaluate_models():
     test_weighted_f1 = f1_score(y_test, y_pred_test, average="weighted", zero_division=0)
     test_report = classification_report(y_test, y_pred_test, target_names=class_names, output_dict=True)
     test_report["overall_accuracy"] = test_accuracy
+    test_report["champion_model"] = best_model_name
     
     # Log champion model to MLflow
     with mlflow.start_run(run_name=f"Production_{best_model_name}"):

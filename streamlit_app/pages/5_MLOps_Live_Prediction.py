@@ -119,7 +119,8 @@ with m2:
 with m3:
     st.metric("🧬 Imbalance Handling", "SMOTE Enabled", help="Synthetic Minority Over-sampling Technique applied to boost minority Fatal crash learning.")
 with m4:
-    st.metric("🏆 Champion Model", "XGBoost", help="Best-performing classifier selected and registered in MLflow.")
+    champion_name = model_metrics.get("champion_model", "LightGBM")
+    st.metric("🏆 Champion Model", champion_name, help="Best-performing classifier selected and registered in MLflow.")
 
 st.divider()
 
