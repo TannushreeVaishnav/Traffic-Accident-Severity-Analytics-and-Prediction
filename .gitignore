@@ -80,3 +80,5 @@ logs/
 *.tmp
 *.bak
 tmp/
+
+.claude/
