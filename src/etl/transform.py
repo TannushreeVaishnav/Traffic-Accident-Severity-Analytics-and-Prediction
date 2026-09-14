@@ -227,12 +227,12 @@ def run_etl_pipeline(batch_id: str = None):
                 except Exception as ex:
                     logger.debug(f"Mart refresh notice: {ex}")
                     
-    # Clear processed staging records to prevent reprocessing on next run
-    with engine.begin() as conn:
-        conn.execute(text("DELETE FROM stg_accidents_raw"))
-    logger.info("Staging table cleared after successful ETL load.")
-    logger.info("ETL transformation, star schema load, and analytical marts refresh complete!")
+    # Staging cleanup is intentionally disabled until final verification.
+    # with engine.begin() as conn:
+    #     conn.execute(text("DELETE FROM stg_accidents_raw"))
+    # logger.info("Staging table cleared after successful ETL load.")
 
+    logger.info("ETL transformation, star schema load, and analytical marts refresh complete!")
 
 if __name__ == "__main__":
     run_etl_pipeline()
