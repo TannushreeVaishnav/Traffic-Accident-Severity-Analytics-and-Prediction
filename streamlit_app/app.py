@@ -29,7 +29,7 @@ st.markdown("""
     .main-title {
         font-size: 2.2rem;
         font-weight: 700;
-        color: #1E293B;
+        color: var(--text-color);
         margin-bottom: 0.2rem;
     }
     .sub-title {
