@@ -82,3 +82,6 @@ logs/
 tmp/
 
 .claude/
+
+# Local source datasets
+datasets/
